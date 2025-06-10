@@ -1,22 +1,38 @@
-version: "3"
-services:
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-    volumes:
-      - ./backend/uploads:/app/uploads
-    env_file:
-      - .env
-    depends_on:
-      - mongo
+version: "3.8"  # Using version 3.8 of Docker Compose format
 
-  mongo:
-    image: mongo
+services:
+  web:  # Your Flask web application service
+    build: .  # Build using the Dockerfile in current directory
     ports:
-      - "27017:27017"
+      - "5000:5000"  # Map host port 5000 to container port 5000
     volumes:
-      - mongo-data:/data/db
+      - ./backend/uploads:/app/uploads  # Persistent storage for uploads
+      - ./frontend:/app/frontend  # Mount frontend files
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/voice_data  # Connection string for MongoDB
+      - FLASK_ENV=development  # Run Flask in development mode
+    depends_on:
+      - mongo  # Ensure MongoDB starts first
+    restart: unless-stopped  # Auto-restart unless manually stopped
+
+  mongo:  # MongoDB service
+    image: mongo:5.0  # Official MongoDB image version 5.0
+    ports:
+      - "27017:27017"  # Standard MongoDB port
+    volumes:
+      - mongo-data:/data/db  # Persistent volume for database files
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin  # Root username
+      - MONGO_INITDB_ROOT_PASSWORD=password  # Root password
+      - MONGO_INITDB_DATABASE=voice_data  # Initial database to create
+    healthcheck:  # Added health check
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped  # Auto-restart unless manually stopped
 
 volumes:
-  mongo-data:
+  mongo-data:  # Named volume for MongoDB persistence
+    driver: local
+

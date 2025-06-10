@@ -2,6 +2,7 @@ import os
 import io
 import librosa
 import numpy as np
+from dotenv import load_dotenv
 import soundfile as sf
 import tempfile
 from io import BytesIO
@@ -14,6 +15,7 @@ from pydub import AudioSegment
 # Flask setup
 app = Flask(__name__)
 CORS(app)
+load_dotenv()  # Load variables from .env
 
 # Config
 app.config["UPLOAD_FOLDER"] = os.path.join(os.getcwd(), "uploads")
@@ -21,8 +23,8 @@ if not os.path.exists(app.config["UPLOAD_FOLDER"]):
     os.makedirs(app.config["UPLOAD_FOLDER"])
 
 # MongoDB setup
-client = MongoClient("mongodb://localhost:27018/")
-db = client["ZTproj30"]
+client = MongoClient("mongodb://localhost:27028/")
+db = client["project_30_zetheta"]
 
 # # --- Feature Extraction Utils ---
 # def compute_rhythm_features(audio, beat_frames, sample_rate):

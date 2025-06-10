@@ -2,3 +2,7 @@ flask
 flask_pymongo
 flask_cors
 python-dotenv
+librosa
+numpy
+soundfile
+pydub
